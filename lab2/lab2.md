@@ -238,13 +238,13 @@
     > i.e., if you set to ERROR, it won't show warnings!
 
 * Logging levels:
-  OFF The highest possible rank and is intended to turn off logging.
-  FATAL Severe errors that cause premature termination (console).
-  ERROR Other runtime errors or unexpected conditions (console).
-  WARN  Almost Errors (console)
-  INFO  Interesting runtime events (startup/shutdown) (console).
-  DEBUG Detailed information on the flow through the system (logs-only)
-  TRACE Most detailed information (logs-only)  
+  * OFF The highest possible rank and is intended to turn off logging.
+  * FATAL Severe errors that cause premature termination (console).
+  * ERROR Other runtime errors or unexpected conditions (console).
+  * WARN  Almost Errors (console)
+  * INFO  Interesting runtime events (startup/shutdown) (console).
+  * DEBUG Detailed information on the flow through the system (logs-only)
+  * TRACE Most detailed information (logs-only)  
   
 # Ant
 
