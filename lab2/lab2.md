@@ -12,7 +12,7 @@
     system, so there is no _correct way_ to build a server. It depends
     on many things, and in this session we are going to see some ideas.
 
-  * Try to keep everything simple!
+  * Advice: always try to keep things simple!
 
 ## Client-Server Model
 
@@ -26,7 +26,7 @@
     3. Send response back
     4. Goto 1.
 
-    > Problems?
+    > Good/Bad?
 
 * Concurrent Server:
     1. Wait for a request
@@ -42,7 +42,19 @@
   * TCP vs. UDP
   * Does the application need it?
 
-* Question: What's the overhead of creating a new thread?
+* Sockets
+  * TCP/IP API (How to access TCP)
+  * TCP: Connection-oriented, Transport-layer protocol (Application, Transport, Network, Link)
+  * OS handles socket details, and even OS leaves the details to the Network stack
+  * Java World: import java.net..; Socket, ServerSocket
+  * Example: ServerExample
+
+  // Java pseudo-code
+  ServerSocket server = new ServerSocket(port);
+  Socket client = server.accept();
+  client.getInputStream(); ..
+
+* Question: What's the overhead of creating/schedule a new thread?
   * Improvement: Why not have a set of static threads around?
   * But, if n threads busy, and n + 1 request comes up?
   * Answer: you need to queue jobs as well
@@ -82,9 +94,10 @@
   * CRLF  //static final byte[] CLRF = {(byte) '\r', (byte) '\n'};
   * Readfile from input stream and write it to the output stream
     > While doing the copy, check for shutdown!
+    > Copy to buffer, and then write it to output, but check
   * Send response 
 
-* Special URLs
+* SpecialCases
   * Control Panel
   * Shutdown
   * (others in MS2)
@@ -118,18 +131,6 @@
      */
 `
 
-* Sockets
-  * TCP/IP API (How to access TCP)
-  * TCP: Connection-oriented, Transport-layer protocol (Application, Transport, Network, Link)
-  * OS handles socket details, and even OS leaves the details to the Network stack
-  * Java World: import java.net..; Socket, ServerSocket
-  * Example: ServerExample
-
-  // Java pseudo-code
-  Server server = new ServerSocket(port);
-  Socket client = server.accept();
-  client.getInputStream(); ..
-
 ## Threads
 
 * Threads vs. Processes?
@@ -137,24 +138,36 @@
   * process keep more information (no shared state, separate address space), threads share memory
   * process communicate via OS mechanisms, threads share state (good and bad)
   * result: an order of magnitude faster context switch
+  * result: 
+      * processes -- put manual effort to share!
+      * threads -- put manual effort to isolate!
 
   _Obviously_ there are many design choices in between (OS-dependent)
 
 * kernel threads vs. user (green) threads
   * Is the kernel scheduler aware of the threads?
-  * Or, are threads available of the cores?
+  * Or, are threads aware of the cores?
   * Kernel threads take longer to swapped
   * User threads are scheduled in user space
   * Java threads are kernel scheduled, for true parallelism
+  * Maybe preemptive vs. cooperative scheduling
+
+* What are they used for?
+  * Operating systems: one kernel thread for each user process.
+  * Scientific applications: one thread per CPU (solve problems more quickly).
+  * Distributed systems: process requests concurrently (overlap I/Os).
+  * Even in GUIS, threads correspond to user actions; can service display during long-running computations.
 
 * Simplest possible model. One thread per connection
-  *  Let's dive into code
+  * Diagram -- Problems? 
+  * How to bound threads?
+  * Let's dive into code
 
 * Let's talk about synchronization:
   * Shared memory between threads can cause problems
   * Race condition: when outcome depends on execution
   * Synchronization: coordination of access to avoid such problems
-  * But wrong synchronization can cause deadlocks, livelocks etc.
+  * But wrong synchronization can cause deadlocks, livelocks, starvation etc.
 
 * Deadlocks -- Coffman pinpointed 4 conditions:
   * Mutual Exclusion
@@ -168,20 +181,70 @@
   * Example code
 
 * More reading
-  * Yes, you are implementing a Web Server in J2ME http://www.oracle.com/technetwork/systems/index-155545.html
-  * Concurrent Programming in Java, by Doug Lea, the de-facto book for concurrency in Java (and, to some extend, beyond)
+  * Yes, in a sense, [you are implementing a Web Server in J2ME] (http://www.oracle.com/technetwork/systems/index-155545.html)
+  * [Java Concurrency in Practice]
+  * (http://www.amazon.com/Java-Concurrency-Practice-Brian-Goetz/dp/0321349601/), by Brian Goetz _et al._
+  * [Concurrent Programming in Java] (http://www.amazon.com/Concurrent-Programming-Java%C2%BF-Principles-Pattern/dp/0201310090), by Doug Lea
+
+# Events
+
+* As we saw, threads are hard, even for experts
+  * Must coordinate access to shared data with locks.
+  * Forget a lock? Corrupted data.
+  * Circular dependencies among locks.
+  * Each process waits for some other process: system hangs.
+  * Hard to debug: data dependencies, timing dependencies.
+  * Threads break abstraction: can’t design modules independently.
+  * Callbacks don’t work with locks.
+  
+*  Some things we did not see:
+  * Achieving good performance is hard:
+    * Simple locking (e.g. monitors) yields low concurrency.
+    * Fine-grain locking increases complexity, reduces performance in normal case.
+    * OSes limit performance (scheduling, context switches).
+  * Threads not well supported:
+    * Hard to port threaded code (PCs? Macs?).
+    * Standard libraries not thread-safe.
+    * Kernel calls, window systems not multi-threaded.
+    * Few debugging tools (LockLint, debuggers?). _You will experience that!_
+  * Often don’t want concurrency anyway (e.g. window events)
+
+* Events
+  * One execution stream: no CPU concurrency.
+  * Register interest in events (callbacks).
+  * Event loop waits for events, invokes handlers.
+  * No preemption of event handlers.
+  * Handlers generally short-lived.
+
+* The debate is old (~1970's! -- see Lauer and Needham) 
+  * (2nd SOSP!)  On the duality of operating system structures.
+  * Programming trends change (see node.js)
+  * Examples apache vs. ngingx
 
 # Logging
 
 * Folks _will_ transition to the debugging phase soon
 
-* Log4j is one logging solution, 
+* Log4j is one logging solution
+  * There others: JLAPI, Apache Commons, SLF4J
   * Idea: log everything into files and then study them
-  * Sort of replay
+  * Sort of record/replay
   * Serializes messages
 
-* Global logging level
-  *
+* Basic idea
+  * Augment your code with debug("blah"), warn("failure")
+  * Set logging format (%d{dd HH:mm:ss} %-4r [%t] %-5p %c %x - %m%n)
+  * Fire up executable with requested level (will filter up lower!)
+    > i.e., if you set to ERROR, it won't show warnings!
+
+* Logging levels:
+  OFF The highest possible rank and is intended to turn off logging.
+  FATAL Severe errors that cause premature termination (console).
+  ERROR Other runtime errors or unexpected conditions (console).
+  WARN  Almost Errors (console)
+  INFO  Interesting runtime events (startup/shutdown) (console).
+  DEBUG Detailed information on the flow through the system (logs-only)
+  TRACE Most detailed information (logs-only)  
   
 # Ant
 
