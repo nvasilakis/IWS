@@ -6,8 +6,6 @@
 
   * 10' Debugging (log4j)
 
-  * 10' Ant
-
   * Before we start: There is probably not _only one_ way to build a
     system, so there is no _correct way_ to build a server. It depends
     on many things, and in this session we are going to see some ideas.
@@ -49,10 +47,12 @@
   * Java World: import java.net..; Socket, ServerSocket
   * Example: ServerExample
 
+```
   // Java pseudo-code
   ServerSocket server = new ServerSocket(port);
   Socket client = server.accept();
   client.getInputStream(); ..
+```
 
 * Question: What's the overhead of creating/schedule a new thread?
   * Improvement: Why not have a set of static threads around?
@@ -112,7 +112,7 @@
 
 * Use _Javadoc_ -- example:
 
-`
+```
     /***
         Show the task thead inverted, starting from old and coming down to new tasks.
      * It parses  command line arguments assigning  specified properties
@@ -130,7 +130,7 @@
      * @return true if there were arguments, false if not.
      * @throws java.io.IOException
      */
-`
+```
 
 ## Threads
 
@@ -254,6 +254,7 @@
   * configure and log in your classes
 
 You can use it on a per-class basis:
+
 `
   static Logger logger = Logger.getLogger(__YOURCLASS__.class);
 `
@@ -262,6 +263,7 @@ Configure based on your properties file (e.g., in your _main_ method):
 `
   PropertyConfigurator.configure("log/log4j.properties");
 `
+
 And use it:
 `
   logger.debug("message");
