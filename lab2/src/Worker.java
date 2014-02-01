@@ -1,5 +1,5 @@
 /**
- * Created by nikos on 1/30/14.
+ * Created by nikos on 1/31/14.
  */
 public class Worker implements Runnable {
     String initText;

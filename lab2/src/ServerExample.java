@@ -1,5 +1,5 @@
 /**
- * Created by nikos on 1/30/14.
+ * Created by nikos on 1/31/14.
  */
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -26,15 +26,14 @@ public class ServerExample {
                 try{
                     BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
                     PrintWriter out = new PrintWriter(System.out,true);
-                    while(true){
-                        try{
-                            String line = in.readLine();
-                            out.println(line);
-                        } catch (IOException e) {
-                            System.out.println("Read failed");
-                            System.exit(-1);
+                    String line;
+                    while((line = in.readLine()) != null){
+                        System.out.println(line);
+                        if (line.length()==0) {
+                            break;
                         }
                     }
+                    System.out.println("Now we can reply");
                 } catch (IOException e) {
                     System.out.println("Read failed");
                     System.exit(-1);

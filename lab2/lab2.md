@@ -107,13 +107,14 @@
     > throw errors, username etc.
   * Logging (OFF, FATAL, ERROR, WARN, INFO, DEBUG, TRACE)
     > people often use the singleton pattern
-  * Configuration (shutdown, timeout, 
+  * Configuration (shutdown, timeout)
     > write once, read globally
 
 * Use _Javadoc_ -- example:
 
 `
     /***
+        Show the task thead inverted, starting from old and coming down to new tasks.
      * It parses  command line arguments assigning  specified properties
      * to the server. Properties  include thread number, listening port,
      * debug level  and root folder.  It handles both the  short version
@@ -229,7 +230,7 @@
   * There others: JLAPI, Apache Commons, SLF4J
   * Idea: log everything into files and then study them
   * Sort of record/replay
-  * Serializes messages
+  * Serializes messages!
 
 * Basic idea
   * Augment your code with debug("blah"), warn("failure")
@@ -237,7 +238,7 @@
   * Fire up executable with requested level (will filter up lower!)
     > i.e., if you set to ERROR, it won't show warnings!
 
-* Logging levels:
+* Logging levels
   * OFF The highest possible rank and is intended to turn off logging.
   * FATAL Severe errors that cause premature termination (console).
   * ERROR Other runtime errors or unexpected conditions (console).
@@ -246,7 +247,25 @@
   * DEBUG Detailed information on the flow through the system (logs-only)
   * TRACE Most detailed information (logs-only)  
   
-# Ant
+* To use log4j
+  * you already have a copy of the jar file
+  * you can create a log/ directory at the same level as src/
+  * put a log4j.properties file in log/ (sample below)
+  * configure and log in your classes
+
+You can use it on a per-class basis:
+`
+  static Logger logger = Logger.getLogger(__YOURCLASS__.class);
+`
+
+Configure based on your properties file (e.g., in your _main_ method):
+`
+  PropertyConfigurator.configure("log/log4j.properties");
+`
+And use it:
+`
+  logger.debug("message");
+`
 
 # Software Engieering
   * Modularize, Componentize!

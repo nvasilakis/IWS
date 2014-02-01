@@ -8,6 +8,10 @@ public class Log4jExample {
 
     public static void main(String[] argv){
         logger.info("Start of setUp");
+        logger.debug("Blah");
+        if (1==1) {
+            logger.warn("1==1!");
+        }
 
     }
 }
